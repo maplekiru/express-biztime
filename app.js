@@ -18,6 +18,8 @@ app.use(express.json());
 // Add Docstrings
 // check exports and imports
 
+
+/** when accessing /companies resources, use companyRoutes router */
 app.use('/companies',companyRoutes);
 
 
