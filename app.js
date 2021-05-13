@@ -3,9 +3,22 @@
 const express = require("express");
 const { NotFoundError } = require("./expressError");
 
+const companyRoutes = require("./routes/companies");
+
 const app = express();
 
 app.use(express.json());
+
+// TODO:
+// - Create companies route and router
+// - Add routes in routes/companies.js (returns JSON)
+  // - Make sure to add error logic
+  // - Make sure to set 201 when using POST
+  // - Make sure to use SQL "sanitize"
+// Add Docstrings
+// check exports and imports
+
+app.use('/companies',companyRoutes);
 
 
 /** 404 handler: matches unmatched routes; raises NotFoundError. */
