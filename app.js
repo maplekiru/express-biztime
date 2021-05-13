@@ -3,7 +3,9 @@
 const express = require("express");
 const { NotFoundError } = require("./expressError");
 
+/** import routes */
 const companyRoutes = require("./routes/companies");
+const invoiceRoutes = require("./routes/invoices");
 
 const app = express();
 
@@ -20,7 +22,10 @@ app.use(express.json());
 
 
 /** when accessing /companies resources, use companyRoutes router */
-app.use('/companies',companyRoutes);
+app.use('/companies', companyRoutes);
+
+/** when accessing /companies resources, use companyRoutes router */
+app.use('/invoices', invoiceRoutes);
 
 
 /** 404 handler: matches unmatched routes; raises NotFoundError. */

@@ -3,7 +3,8 @@ const db = require("../db");
 const { NotFoundError, BadRequestError } = require("../expressError");
 
 const router = new express.Router();
-/** GET /companies: get list of companies RETURN JSON {companies: [{code, name}, ...]} */
+/** GET /companies: get list of companies 
+ * RETURN JSON {companies: [{code, name}, ...]} */
 router.get("/", async function (req, res, next) {
 
   const results = await db.query(`
@@ -16,19 +17,31 @@ router.get("/", async function (req, res, next) {
 });
 
 /** GET /companies/:code : get a single company 
- * RETURN JSON {company: {code, name, and description}} */
+ * RETURN JSON {company: {code, name, and description},
+ * invoice: {id, comp_code, amt, paid, add_date, paid_date}} */
 router.get("/:code", async function (req, res, next) {
 
-  const code = req.params.code
-  const results = await db.query(`
+  const code = req.params.code;
+
+  const cResults = await db.query(`
     SELECT code, name description 
     FROM companies 
     WHERE code = $1`,
   [code]);
 
-  const company = results.rows[0];
+  const iResults = await db.query(`
+    SELECT id, comp_code, amt, paid, add_date, paid_date
+    FROM invoices as i
+    JOIN companies as c on c.code = i.comp_code 
+    WHERE c.code = $1`,
+  [code]);
 
-  if (!company) throw new NotFoundError(`not found: ${code}`)
+  const company = cResults.rows[0];
+  const invoices = iResults.rows;
+
+  if (!company) throw new NotFoundError(`not found: ${code}`);
+
+  company.invoices = invoices;
   return res.json({ company });
 });
 
@@ -67,11 +80,10 @@ router.put("/:code", async function (req, res, next) {
   [name, description, code]);
 
   const company = results.rows[0];
-  console.log(`results are `, results, `company is `, company)
 
-  if (!company) throw new NotFoundError(`not found: ${code} - update failed.`)
+  if (!company) throw new NotFoundError(`not found: ${code}`)
 
-  return res.status(200).json({ company });
+  return res.json({ company });
 });
 
 /** DELETE /company/:id delete company 
